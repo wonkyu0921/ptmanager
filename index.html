@@ -125,6 +125,8 @@ body{font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;back
 input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:99px;background:var(--surface3);outline:none}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;cursor:pointer}
 .range-carb::-webkit-slider-thumb{background:var(--amber)}
+#adj-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--brand);cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+#adj-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--brand);cursor:pointer;border:none;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .range-prot::-webkit-slider-thumb{background:var(--brand)}
 .range-fat::-webkit-slider-thumb{background:var(--red)}
 .range-carb::-webkit-slider-thumb{background:var(--amber)}
@@ -404,17 +406,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       </div>
       <div id="food-cal" style="display:none">
       <div class="card">
-        <div class="card-title">칼로리 계산</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div>
-            <div style="font-size:10px;color:var(--text3);margin-bottom:4px">기초대사량 (kcal)</div>
-            <input class="form-input" type="number" id="i-bmr" value="1565" style="padding:8px 10px;font-size:14px;width:100%">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="card-title" style="margin-bottom:0">칼로리 계산</div>
+          <div style="font-size:9px;color:var(--brand);font-weight:600">🔄 인바디 자동반영</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+            <div style="font-size:9px;color:var(--text3);margin-bottom:4px">기초대사량</div>
+            <div><span id="i-bmr-display" style="font-size:18px;font-weight:700;color:var(--text)">1565</span><span style="font-size:10px;color:var(--text3);margin-left:2px">kcal</span></div>
           </div>
-          <div>
-            <div style="font-size:10px;color:var(--text3);margin-bottom:4px">체중 (kg)</div>
-            <input class="form-input" type="number" id="i-wt" value="73.2" step="0.1" style="padding:8px 10px;font-size:14px;width:100%">
+          <div style="background:var(--surface2);border-radius:10px;padding:10px 12px">
+            <div style="font-size:9px;color:var(--text3);margin-bottom:4px">체중</div>
+            <div><span id="i-wt-display" style="font-size:18px;font-weight:700;color:var(--text)">73.2</span><span style="font-size:10px;color:var(--text3);margin-left:2px">kg</span></div>
           </div>
         </div>
+        <input type="hidden" id="i-bmr" value="1565">
+        <input type="hidden" id="i-wt" value="73.2">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div>
             <div style="font-size:10px;color:var(--text3);margin-bottom:4px">목표 체중 (kg)</div>
@@ -444,10 +451,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div id="cal-result" style="display:none">
           <div class="result-cards" style="margin-top:10px">
             <div class="rc"><div class="rc-label">유지 칼로리</div><div class="rc-val" id="r-maint">—</div></div>
-            <div class="rc"><div class="rc-label">권장 섭취</div><div class="rc-val" id="r-intake">—</div></div>
+            <div class="rc"><div class="rc-label">권장 섭취</div><div class="rc-val" id="r-intake">—</div><div style="font-size:10px;color:var(--red);font-weight:600;margin-top:2px" id="r-deficit"></div></div>
             <div class="rc"><div class="rc-label">예상 기간</div><div class="rc-val" id="r-weeks">—</div></div>
           </div>
+          <div style="margin-top:14px;background:var(--surface2);border-radius:12px;padding:12px 14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font-size:12px;font-weight:600;color:var(--text)" id="adj-label">차감률</span>
+              <span style="font-size:13px;font-weight:700;color:var(--brand)" id="adj-val">20%</span>
+            </div>
+            <input type="range" id="adj-slider" min="5" max="30" step="1" value="20"
+              oninput="onAdjSlider()"
+              style="width:100%;accent-color:var(--brand);height:4px;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,var(--brand) 0%,var(--brand) 50%,var(--border2) 50%,var(--border2) 100%);border-radius:2px;outline:none;cursor:pointer">
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:5px">
+              <span id="adj-min-label">5%</span><span id="adj-max-label">30%</span>
+            </div>
+          </div>
         </div>
+        <button id="cal-save-btn" onclick="" style="display:none;width:100%;margin-top:12px;padding:11px;border-radius:10px;background:var(--brand);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">💾 반영하기</button>
       </div>
       <div class="card">
         <div class="card-title">매크로 비율 설정</div>
@@ -508,9 +528,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
           <div class="card-title">AI 식단 설정</div>
           <!-- 칼로리탭에서 설정한 값 표시 (읽기 전용) -->
           <div style="background:var(--surface2);border-radius:10px;padding:10px 12px;margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="margin-bottom:8px">
               <span style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">칼로리 탭에서 설정된 값</span>
-              <button onclick="switchTab('calorie',document.querySelectorAll('.nav-item')[3])" style="font-size:10px;color:var(--brand);background:none;border:none;cursor:pointer;font-family:inherit;padding:0">수정 →</button>
             </div>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
               <div style="background:var(--surface3);border-radius:8px;padding:8px;text-align:center">
@@ -970,7 +989,9 @@ function lsnRecentHTML(m){
         (r.comment?'<div style="font-size:11px;color:var(--text2);margin-top:2px">💬 '+r.comment.slice(0,40)+(r.comment.length>40?'...':'')+'</div>':'')+
       '</div>';
     } else {
-      var exStr2=(r.exercises||[]).slice(0,3).map(function(e){return e.n;}).join(' · ');
+      var exStr2=(r.exercises||[]).slice(0,3).map(function(e){
+        return e.n+(e.wt||e.kg?' '+(e.wt||e.kg)+'kg':'');
+      }).join(' · ');
       return '<div style="padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:6px;border-left:3px solid var(--amber)">'+
         '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+
           '<span style="font-size:16px">🏃</span>'+
@@ -978,6 +999,7 @@ function lsnRecentHTML(m){
           '<span style="font-size:10px;padding:1px 5px;border-radius:4px;background:rgba(210,153,34,.12);color:var(--amber)">개인</span>'+
         '</div>'+
         (exStr2?'<div style="font-size:11px;color:var(--text3)">🏋️ '+exStr2+'</div>':'')+
+        (r.note?'<div style="font-size:11px;color:var(--text2);margin-top:2px">📝 '+r.note.slice(0,40)+(r.note.length>40?'...':'')+'</div>':'')+
       '</div>';
     }
   }).join('');
@@ -1043,11 +1065,13 @@ function renderLsnLog(){
         (r.nextGoal?'<div style="font-size:11px;color:var(--text3);margin-top:3px">🎯 '+r.nextGoal+'</div>':'')+
       '</div>';
     } else {
-      // 개인 운동기록
+      // 개인 운동기록 - 중량/횟수/세트 컬럼 표시
       var exRows2=(r.exercises||[]).map(function(e){
-        return '<div style="display:grid;grid-template-columns:1fr auto;gap:4px;padding:3px 0;border-bottom:.5px solid var(--border)">'
+        return '<div style="display:grid;grid-template-columns:1fr 55px 45px 45px;gap:4px;padding:4px 0;border-bottom:.5px solid var(--border)">'
           +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+e.n+'</div>'
-          +'<div style="font-size:12px;color:var(--text3)">'+(e.s||'')+'</div>'
+          +'<div style="font-size:12px;text-align:center;color:var(--text2)">'+(e.wt||e.kg?((e.wt||e.kg)+'kg'):'—')+'</div>'
+          +'<div style="font-size:12px;text-align:center;color:var(--text2)">'+(e.reps?e.reps+'회':'—')+'</div>'
+          +'<div style="font-size:12px;text-align:center;color:var(--text2)">'+(e.sets?e.sets+'set':'—')+'</div>'
           +'</div>';
       }).join('');
       return '<div class="card" style="margin-bottom:8px;border-left:3px solid var(--amber)">'+
@@ -1059,11 +1083,22 @@ function renderLsnLog(){
                 '<span style="font-size:13px;font-weight:700">'+r.date+'</span>'+
                 '<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(210,153,34,.12);color:var(--amber);font-weight:600">개인운동</span>'+
               '</div>'+
+              (r.pain?'<div style="font-size:11px;color:var(--red);margin-top:1px">⚠ '+r.pain+'</div>':'')+
             '</div>'+
           '</div>'+
         '</div>'+
-        (exRows2?'<div style="margin-bottom:6px">'+exRows2+'</div>':'')+
+        (exRows2?
+          '<div style="margin-bottom:8px">'+
+            '<div style="display:grid;grid-template-columns:1fr 55px 45px 45px;gap:4px;margin-bottom:3px">'+
+              '<div style="font-size:10px;color:var(--text3)">운동</div>'+
+              '<div style="font-size:10px;color:var(--text3);text-align:center">중량</div>'+
+              '<div style="font-size:10px;color:var(--text3);text-align:center">횟수</div>'+
+              '<div style="font-size:10px;color:var(--text3);text-align:center">세트</div>'+
+            '</div>'+
+            exRows2+
+          '</div>':'')+
         (r.note?'<div style="font-size:12px;color:var(--text2);padding:7px 9px;background:var(--surface2);border-radius:8px;line-height:1.6">📝 '+r.note+'</div>':'')+
+        (r.goal?'<div style="font-size:11px;color:var(--brand);margin-top:4px">🎯 '+r.goal+'</div>':'')+
       '</div>';
     }
   }).join('');
@@ -2471,11 +2506,53 @@ function enterMemberMode(memberId){
 }
 
 function goMemberMode(){
-  // Show PIN screen in member mode directly
-  document.querySelector('.app').style.display='none';
-  document.getElementById('pin-screen').style.display='flex';
-  selectMode('member');
+  // 회원 PIN 팝업
+  var overlay=document.createElement('div');
+  overlay.id='member-pin-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:9999';
+  overlay.innerHTML='<div style="background:var(--surface);border-radius:16px;padding:24px 20px;width:280px;text-align:center">'
+    +'<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">회원 모드 전환</div>'
+    +'<div style="font-size:12px;color:var(--text3);margin-bottom:16px">회원 PIN을 입력해 주세요</div>'
+    +'<div id="mpin-dots" style="display:flex;justify-content:center;gap:10px;margin-bottom:16px">'
+    +'<span style="width:12px;height:12px;border-radius:50%;background:var(--surface3);display:inline-block"></span>'
+    +'<span style="width:12px;height:12px;border-radius:50%;background:var(--surface3);display:inline-block"></span>'
+    +'<span style="width:12px;height:12px;border-radius:50%;background:var(--surface3);display:inline-block"></span>'
+    +'<span style="width:12px;height:12px;border-radius:50%;background:var(--surface3);display:inline-block"></span>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">'
+    +(function(){return [1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(function(k){
+      if(k==='')return '<div></div>';
+      return '<button onclick="mpinKey('+JSON.stringify(k)+')" style="padding:14px;border-radius:10px;background:var(--surface2);border:.5px solid var(--border);color:var(--text);font-size:18px;font-weight:600;cursor:pointer;font-family:inherit">'+k+'</button>';
+    }).join('');})()
+    +'</div>'
+    +'<button onclick="closeMpinOverlay()" style="width:100%;padding:10px;border-radius:10px;background:var(--surface2);border:none;color:var(--text3);font-size:13px;cursor:pointer;font-family:inherit;margin-top:4px">취소</button>'
+    +'</div>';
+  document.body.appendChild(overlay);
+  window._mpinBuf='';
 }
+function mpinKey(k){
+  if(k==='⌫'){window._mpinBuf=(window._mpinBuf||'').slice(0,-1);}
+  else if((window._mpinBuf||'').length<4){window._mpinBuf=(window._mpinBuf||'')+String(k);}
+  var dots=document.querySelectorAll('#mpin-dots span');
+  dots.forEach(function(d,i){d.style.background=i<window._mpinBuf.length?'var(--brand)':'var(--surface3)';});
+  if(window._mpinBuf.length===4){
+    setTimeout(function(){
+      // 해당 PIN의 회원 찾기
+      var found=S.members.find(function(m){return String(m.pin||'').padStart(4,'0')===window._mpinBuf||String(m.id)===window._mpinBuf;});
+      if(found){
+        closeMpinOverlay();
+        enterMemberMode(found.id);
+      } else {
+        // PIN 불일치 - 빨간 표시
+        window._mpinBuf='';
+        var d2=document.querySelectorAll('#mpin-dots span');
+        d2.forEach(function(d){d.style.background='var(--red)';});
+        setTimeout(function(){d2.forEach(function(d){d.style.background='var(--surface3)';});},600);
+      }
+    },120);
+  }
+}
+function closeMpinOverlay(){var o=document.getElementById('member-pin-overlay');if(o)o.remove();window._mpinBuf='';}
 function exitMemberMode(){
   currentMode=null;
   document.getElementById('member-app').style.display='none';
@@ -2654,6 +2731,7 @@ function memberSaveInbody(){
   t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;z-index:400;white-space:nowrap';
   t.textContent='인바디 저장 완료!';document.body.appendChild(t);setTimeout(function(){t.remove();},1800);
   renderMemberInfo();
+  syncCalPage();
 }
 
 // ── 오늘 운동 탭 ──
@@ -2926,18 +3004,49 @@ function renderMemberFeedback(){
 // ── AI 식단 탭 ──
 function renderMemberDiet(){
   var m=M();var el=document.getElementById('msec-diet');if(!el)return;
-  var intake=Math.round(m.bmr*1.375*(m.plan==='diet'?.8:m.plan==='bulk'?1.1:1));
-  el.innerHTML='<div class="pill-tabs">'
+  var intake=m.calcData?m.calcData.intake:Math.round(m.bmr*1.375*(m.plan==='diet'?.8:m.plan==='bulk'?1.1:1));
+  var calcCard='';
+  if(m.calcData){
+    var cd=m.calcData;
+    var goalTxt=cd.goal==='diet'?'다이어트':cd.goal==='bulk'?'벌크업':'유지';
+    var defVal=Math.abs(cd.maintain-cd.intake);
+    var defTxt=cd.goal==='diet'?'차감 -'+defVal.toLocaleString()+'kcal':cd.goal==='bulk'?'+'+defVal.toLocaleString()+'kcal':'';
+    var monthsStr='';
+    if(cd.weeks>0){var mo=Math.floor(cd.weeks/4.33*10)/10;monthsStr=mo+'달 ('+cd.weeks+'주)';}
+    calcCard='<div class="card" style="margin-bottom:8px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--text)">📊 칼로리 플랜</div>'
+      +'<div style="font-size:10px;color:var(--text3)">'+cd.savedAt+' 저장</div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      +'<div style="background:var(--surface2);border-radius:10px;padding:10px;text-align:center">'
+        +'<div style="font-size:9px;color:var(--text3);margin-bottom:3px">유지 칼로리</div>'
+        +'<div style="font-size:15px;font-weight:700;color:var(--text)">'+cd.maintain.toLocaleString()+'kcal</div>'
+      +'</div>'
+      +'<div style="background:rgba(46,160,67,.08);border-radius:10px;padding:10px;text-align:center">'
+        +'<div style="font-size:9px;color:var(--text3);margin-bottom:3px">권장 섭취</div>'
+        +'<div style="font-size:15px;font-weight:700;color:var(--brand)">'+cd.intake.toLocaleString()+'kcal</div>'
+        +(defTxt?'<div style="font-size:10px;color:var(--red);font-weight:600;margin-top:1px">'+defTxt+'</div>':'')
+      +'</div>'
+      +'<div style="background:var(--surface2);border-radius:10px;padding:10px;text-align:center">'
+        +'<div style="font-size:9px;color:var(--text3);margin-bottom:3px">목표</div>'
+        +'<div style="font-size:14px;font-weight:700;color:var(--text)">'+goalTxt+'</div>'
+      +'</div>'
+      +(monthsStr?'<div style="background:var(--surface2);border-radius:10px;padding:10px;text-align:center">'
+        +'<div style="font-size:9px;color:var(--text3);margin-bottom:3px">예상 기간</div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--amber)">'+monthsStr+'</div>'
+      +'</div>':'')
+      +'</div>'
+      +'</div>';
+  }
+  el.innerHTML=calcCard+'<div class="pill-tabs">'
     +'<button class="pill-tab active" data-tab="ai" onclick="mDietTabBtn(this)">AI 식단 추천</button>'
     +'<button class="pill-tab" data-tab="chat" onclick="mDietTabBtn(this)">AI 상담</button>'
     +'</div>'
     +'<div id="mdiet-ai">'
     +'<div class="card">'
     +'<div class="card-title">AI 식단 설정</div>'
-    +'<div style="background:var(--surface2);border-radius:10px;padding:10px;margin-bottom:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:6px;text-align:center">'
-    +'<div><div style="font-size:9px;color:var(--text3)">권장 칼로리</div><div style="font-size:16px;font-weight:700;color:var(--amber)">'+intake+'kcal</div></div>'
-    +'<div><div style="font-size:9px;color:var(--text3)">목표</div><div style="font-size:14px;font-weight:700;color:var(--text)">'+(m.plan==='diet'?'다이어트':m.plan==='bulk'?'벌크업':'유지')+'</div></div>'
-    +'</div>'
+
     +'<div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text3);margin-bottom:4px">기피 식품 (선택)</div><input class="form-input" type="text" id="mb-avoid" placeholder="예: 유제품, 밀가루..." style="width:100%;padding:8px 10px;font-size:13px"></div>'
     +'<div style="background:var(--surface2);border-radius:10px;padding:10px 12px;margin-bottom:10px">'
     +'<div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:8px">개인 특이사항 (선택)</div>'
@@ -3811,6 +3920,36 @@ function saveSetLog(progId,week){
   var needed=Math.ceil(sets/2); // need at least half sets as success to advance weight
   var passed=successCount>=needed;
   S.setLogs[weekResultKey(progId,week)]=passed?'pass':'fail';
+
+  // ── 레슨/개인운동 자동 등록 ──
+  var today=new Date().toISOString().slice(0,10);
+  var exEntry={n:p.name,wt:String(getWeekWeight(p,week)||''),reps:String(p.reps||''),sets:String(successCount)+'/'+String(sets)};
+
+  if(currentMode==='trainer'){
+    // 트레이너: 레슨으로 등록
+    if(!m.lessons)m.lessons=[];
+    var existLesson=m.lessons.find(function(l){return l.date===today&&l._fromSet;});
+    if(existLesson){
+      // 같은 날짜 레슨에 합치기
+      if(!existLesson.exercises)existLesson.exercises=[];
+      existLesson.exercises.push(exEntry);
+    } else {
+      m.lessons.push({date:today,cond:3,pain:'',comment:'',nextGoal:'',exercises:[exEntry],noshow:false,ts:Date.now(),_fromSet:true});
+      m.usedSessions=(m.usedSessions||0)+1;
+    }
+    renderLsnManage();renderLsnLog();
+  } else if(currentMode==='member'){
+    // 회원: 개인운동으로 등록
+    if(!m.personalWorkouts)m.personalWorkouts=[];
+    var existPW=m.personalWorkouts.find(function(w){return w.date===today&&w._fromSet;});
+    if(existPW){
+      if(!existPW.exercises)existPW.exercises=[];
+      existPW.exercises.push(exEntry);
+    } else {
+      m.personalWorkouts.push({date:today,note:'',goal:'',pain:'',condition:3,exercises:[exEntry],_fromSet:true,ts:Date.now()});
+    }
+  }
+
   save();
   refreshHistoryRow(progId,week);
   // Show feedback
@@ -4100,9 +4239,15 @@ function setMeals(val,btn){
 }
 function syncCalPage(){
   var m=M();
+  // hidden input 업데이트
   document.getElementById('i-bmr').value=m.bmr;
   document.getElementById('i-wt').value=m.weight;
   document.getElementById('i-tgt').value=m.targetWeight;
+  // 표시 박스 업데이트
+  var bmrDisp=document.getElementById('i-bmr-display');
+  if(bmrDisp)bmrDisp.textContent=m.bmr.toLocaleString();
+  var wtDisp=document.getElementById('i-wt-display');
+  if(wtDisp)wtDisp.textContent=m.weight;
   var goalEl=document.getElementById('i-goal');if(goalEl)goalEl.value=m.plan||'diet';
   var actVal=parseFloat(document.getElementById('i-act').value)||1.375;
   document.querySelectorAll('.act-btn').forEach(function(b){
@@ -4120,20 +4265,91 @@ function doCalc(){
   const act=parseFloat(document.getElementById('i-act').value)||1.375;
   const goal=document.getElementById('i-goal').value;
   const maintain=Math.round(bmr*act);
-  const adj=goal==='diet'?-.2:goal==='bulk'?.1:0;
+  // 슬라이더 범위 목표에 따라 조정
+  var slider=document.getElementById('adj-slider');
+  var adjLabel=document.getElementById('adj-label');
+  var adjMinLabel=document.getElementById('adj-min-label');
+  var adjMaxLabel=document.getElementById('adj-max-label');
+  if(slider){
+    if(goal==='diet'){
+      slider.min=5;slider.max=30;slider.step=1;
+      if(parseInt(slider.value)<5)slider.value=20;
+      if(parseInt(slider.value)>30)slider.value=20;
+      if(adjLabel)adjLabel.textContent='차감률';
+      if(adjMinLabel)adjMinLabel.textContent='5%';
+      if(adjMaxLabel)adjMaxLabel.textContent='30%';
+    } else if(goal==='bulk'){
+      slider.min=5;slider.max=20;slider.step=1;
+      if(parseInt(slider.value)>20)slider.value=10;
+      if(adjLabel)adjLabel.textContent='증량률';
+      if(adjMinLabel)adjMinLabel.textContent='5%';
+      if(adjMaxLabel)adjMaxLabel.textContent='20%';
+    } else {
+      slider.min=0;slider.max=0;slider.value=0;
+      if(adjLabel)adjLabel.textContent='유지';
+    }
+    var adjValEl=document.getElementById('adj-val');
+    var _pct2=parseInt(slider.value);
+    if(adjValEl)adjValEl.textContent=(goal==='maintain'?'0':_pct2)+'%';
+    var _min2=parseInt(slider.min),_max2=parseInt(slider.max);
+    if(_max2>_min2){var _r2=((_pct2-_min2)/(_max2-_min2)*100).toFixed(1);slider.style.background='linear-gradient(to right,var(--brand) 0%,var(--brand) '+_r2+'%,var(--border2) '+_r2+'%,var(--border2) 100%)';}
+  }
+  var pct=slider?parseInt(slider.value):0;
+  const adj=goal==='diet'?-(pct/100):goal==='bulk'?(pct/100):0;
   const intake=Math.round(maintain*(1+adj));
-  const wkly=Math.abs(maintain*adj)/7700;
-  const weeks=wkly>0?Math.round(Math.abs(wt-tgt)/wkly):0;
+  // 하루 차감칼로리 → 주당 감량kg (7700kcal = 1kg)
+  const dailyDiff=Math.abs(maintain*adj);
+  const weeklyLoss=dailyDiff*7/7700;
+  const weeks=weeklyLoss>0?Math.round(Math.abs(wt-tgt)/weeklyLoss):0;
   S.intake=intake;S.wt=wt;
   var _rm=document.getElementById('r-maint');if(_rm)_rm.textContent=maintain.toLocaleString()+'kcal';
   var _ri=document.getElementById('r-intake');if(_ri)_ri.textContent=intake.toLocaleString()+'kcal';
-  var _rw=document.getElementById('r-weeks');if(_rw)_rw.textContent=weeks>0?'약 '+weeks+'주':'—';
+  var _def=document.getElementById('r-deficit');
+  if(_def){
+    var defVal=Math.abs(maintain-intake);
+    if(goal==='diet')_def.textContent='차감 -'+defVal.toLocaleString()+'kcal';
+    else if(goal==='bulk')_def.textContent='+'+defVal.toLocaleString()+'kcal';
+    else _def.textContent='';
+  }
+  var _rw=document.getElementById('r-weeks');
+  if(_rw){
+    if(weeks>0){
+      var months=(weeks/4.33);
+      var monthsFloor=Math.floor(months*10)/10;
+      _rw.innerHTML=monthsFloor+'달<br><span style="font-size:12px;font-weight:700;color:var(--red)">('+weeks+'주)</span>';
+    } else { _rw.textContent='—'; }
+  }
   var _cr=document.getElementById('cal-result');if(_cr)_cr.style.display='block';
   var _ak=document.getElementById('ai-kcal');if(_ak)_ak.value=intake;
   var _ag=document.getElementById('ai-goal');if(_ag)_ag.value=goal;
+  // 저장 버튼 표시
+  var _sb=document.getElementById('cal-save-btn');
+  if(_sb){_sb.style.display='block';_sb.onclick=function(){saveCalcToMember(maintain,intake,goal,weeks);};}
   updateAllMacros();
-  // Sync AI diet display cards
   syncAIDietDisplay();
+}
+function saveCalcToMember(maintain,intake,goal,weeks){
+  var m=M();if(!m)return;
+  m.calcData={maintain:maintain,intake:intake,goal:goal,weeks:weeks,savedAt:new Date().toISOString().slice(0,10)};
+  save();
+  renderMemberDiet();
+  // 저장 완료 토스트
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--brand);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;';
+  t.textContent='✅ 회원 식단 정보에 저장됐습니다';
+  document.body.appendChild(t);
+  setTimeout(function(){t.remove();},2000);
+}
+function onAdjSlider(){
+  var slider=document.getElementById('adj-slider');
+  var adjValEl=document.getElementById('adj-val');
+  var pct=parseInt(slider.value);
+  if(adjValEl)adjValEl.textContent=pct+'%';
+  // 슬라이더 그라데이션 업데이트
+  var min=parseInt(slider.min),max=parseInt(slider.max);
+  var ratio=((pct-min)/(max-min)*100).toFixed(1);
+  slider.style.background='linear-gradient(to right,var(--brand) 0%,var(--brand) '+ratio+'%,var(--border2) '+ratio+'%,var(--border2) 100%)';
+  doCalc();
 }
 function setMacroMode(mode,btn){
   S.macroMode=mode;
@@ -4388,6 +4604,7 @@ function addMember(){
 
 // ========== TIMER ==========
 let tI=null,tS=0,tR=false,tC=false,tT=0;
+function setTimer(sec,label){tSet(sec);if(label){document.getElementById('ts').textContent=label;}tToggle();}
 function tToggle(){if(tR){clearInterval(tI);tR=false;document.getElementById('t-start').textContent='계속';document.getElementById('td').classList.remove('running');}else{tR=true;document.getElementById('t-start').textContent='일시정지';document.getElementById('td').classList.add('running');document.getElementById('td').classList.remove('done');tI=setInterval(()=>{if(tC){tT--;if(tT<=0){clearInterval(tI);tR=false;tC=false;document.getElementById('td').textContent='완료!';document.getElementById('td').className='timer-display done';document.getElementById('t-start').textContent='시작';document.getElementById('ts').textContent='✓ 완료';if(navigator.vibrate)navigator.vibrate([200,100,200]);return;}tDisp(tT);}else{tS++;tDisp(tS);}},1000);}}
 function setTimerCustom(){
   var m=parseInt((document.getElementById('t-min')||{value:'0'}).value)||0;
